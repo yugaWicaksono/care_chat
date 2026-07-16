@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="nl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Care Product Repair Assistant</title>
+<title>Reparatie-assistent voor zorgproducten</title>
 <style>
   * { box-sizing: border-box; margin: 0; }
   body {
@@ -80,11 +80,11 @@
 </head>
 <body>
 <main>
-  <header>🛠️ Care Product Repair Assistant</header>
+  <header>🛠️ Reparatie-assistent voor zorgproducten</header>
   <div id="messages"></div>
   <form id="form">
-    <input id="input" placeholder="Describe the problem with your product…" autocomplete="off" autofocus>
-    <button id="send" type="submit">Send</button>
+    <input id="input" placeholder="Beschrijf het probleem met uw product…" autocomplete="off" autofocus>
+    <button id="send" type="submit">Versturen</button>
   </form>
 </main>
 <script>
@@ -103,7 +103,7 @@
     return div;
   }
 
-  addBubble("Hi! I can help with repairs of your care products, like wheelchairs and support beds. What seems to be the problem?", "bot");
+  addBubble("Hoi! Ik help u graag bij het repareren van uw zorgproducten, zoals rolstoelen en zorgbedden. Wat is het probleem?", "bot");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -122,7 +122,7 @@
       if (!res.ok) throw new Error("HTTP " + res.status);
       typing.textContent = (await res.json()).reply;
     } catch (err) {
-      typing.textContent = "Sorry, something went wrong: " + err.message;
+      typing.textContent = "Sorry, er ging iets mis: " + err.message;
     } finally {
       send.disabled = input.disabled = false;
       input.focus();

@@ -17,7 +17,7 @@ Runs entirely local: FastAPI backend + [Ollama](https://ollama.com) for the mode
 ## Setup
 
 ```bash
-ollama pull qwen2.5:7b-instruct
+ollama pull qwen2.5:14b-instruct
 
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt

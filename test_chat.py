@@ -35,8 +35,8 @@ def test_major_path_writes_ticket_with_server_severity(monkeypatch, tmp_path):
         "function": {
             "name": "log_replacement_request",
             "arguments": {
-                "product": "Wheelchair",
-                "issue": "frame crack",
+                "product": "Rolstoel",
+                "issue": "scheur in frame",
                 "contact_name": "Alex",
                 "contact_info": "alex@example.com",
                 "address": "1 Main St",
@@ -63,7 +63,7 @@ def test_major_path_writes_ticket_with_server_severity(monkeypatch, tmp_path):
     assert len(lines) == 1
     ticket = json.loads(lines[0])
     assert ticket["severity"] == "major"  # resolved server-side from protocols.json
-    assert ticket["product"] == "Wheelchair"
+    assert ticket["product"] == "Rolstoel"
     assert ticket["contact_name"] == "Alex"
     assert ticket["ticket_id"]
 
@@ -75,8 +75,8 @@ def test_fabricated_contact_details_rejected(monkeypatch, tmp_path):
         "function": {
             "name": "log_replacement_request",
             "arguments": {
-                "product": "wheelchair",
-                "issue": "frame crack",
+                "product": "rolstoel",
+                "issue": "scheur in frame",
                 "contact_name": "John Doe",
                 "contact_info": "john.doe@example.com",
                 "address": "123 Main St, Anytown USA",

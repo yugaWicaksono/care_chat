@@ -1,70 +1,70 @@
 {
-  "wheelchair": {
-    "flat tire": {
+  "rolstoel": {
+    "lekke band": {
       "severity": "minor",
       "steps": [
-        "Ensure the wheelchair is stable and the user is not seated in it.",
-        "Check if the tire is punctured or just deflated; inflate to the pressure printed on the tire sidewall.",
-        "If punctured, remove the wheel using the quick-release axle or wrench.",
-        "Replace the inner tube or use a patch kit on the puncture.",
-        "Refit the wheel and confirm it spins freely and brakes grip properly."
+        "Zorg dat de rolstoel stabiel staat en dat er niemand in zit.",
+        "Controleer of de band lek is of alleen leeg; pomp op tot de druk die op de zijkant van de band staat.",
+        "Bij een lekke band: verwijder het wiel met de snelspanas of een moersleutel.",
+        "Vervang de binnenband of gebruik een reparatieset op het gat.",
+        "Plaats het wiel terug en controleer of het vrij draait en de remmen goed grijpen."
       ]
     },
-    "brake failure": {
+    "remmen defect": {
       "severity": "major",
       "steps": [
-        "Stop using the wheelchair immediately; failing brakes are a safety risk.",
-        "Do not attempt to ride the wheelchair until it has been serviced."
+        "Gebruik de rolstoel meteen niet meer; falende remmen zijn een veiligheidsrisico.",
+        "Probeer niet met de rolstoel te rijden totdat deze is nagekeken."
       ]
     },
-    "frame crack": {
+    "scheur in frame": {
       "severity": "major",
       "steps": [
-        "Stop using the wheelchair immediately; a cracked frame can collapse.",
-        "Do not attempt a DIY weld or brace."
+        "Gebruik de rolstoel meteen niet meer; een gescheurd frame kan bezwijken.",
+        "Probeer niet zelf te lassen of te verstevigen."
       ]
     },
-    "torn upholstery": {
+    "gescheurde bekleding": {
       "severity": "minor",
       "steps": [
-        "Check whether the tear affects the seat's support; small surface tears are cosmetic.",
-        "Clean the area around the tear with mild soap and let it dry.",
-        "Apply a vinyl/fabric repair patch over the tear, pressing firmly.",
-        "If the tear is larger than a hand's width or the seat sags, request a seat replacement."
+        "Controleer of de scheur de ondersteuning van de zitting aantast; kleine scheuren zijn cosmetisch.",
+        "Maak het gebied rond de scheur schoon met milde zeep en laat het drogen.",
+        "Breng een reparatiepatch voor vinyl/stof aan over de scheur en druk stevig aan.",
+        "Is de scheur breder dan een hand of zakt de zitting door, vraag dan een vervangende zitting aan."
       ]
     }
   },
-  "support bed": {
-    "motor failure": {
+  "zorgbed": {
+    "motor defect": {
       "severity": "major",
       "steps": [
-        "Unplug the bed from mains power.",
-        "Do not open the motor housing; it must be serviced by a technician."
+        "Haal de stekker van het bed uit het stopcontact.",
+        "Open de motorbehuizing niet; dit moet door een technicus worden nagekeken."
       ]
     },
-    "remote unresponsive": {
+    "afstandsbediening reageert niet": {
       "severity": "minor",
       "steps": [
-        "Check the remote's cable is firmly plugged into the control box under the bed.",
-        "Replace the remote's batteries if it is a wireless model.",
-        "Unplug the bed from mains power for 60 seconds, then plug back in to reset the control box.",
-        "Test each button; if only some buttons fail, the remote itself needs replacement."
+        "Controleer of de kabel van de afstandsbediening goed vastzit in de bedieningskast onder het bed.",
+        "Vervang de batterijen van de afstandsbediening als het een draadloos model is.",
+        "Haal de stekker 60 seconden uit het stopcontact en steek deze er weer in om de bedieningskast te resetten.",
+        "Test elke knop; werken maar enkele knoppen niet, dan moet de afstandsbediening zelf vervangen worden."
       ]
     },
-    "frame bent": {
+    "frame verbogen": {
       "severity": "major",
       "steps": [
-        "Stop adjusting the bed; a bent frame can jam the motor or collapse.",
-        "Keep the bed in a flat, stable position until it is serviced."
+        "Stop met het verstellen van het bed; een verbogen frame kan de motor blokkeren of bezwijken.",
+        "Houd het bed vlak en stabiel totdat het is nagekeken."
       ]
     },
-    "mattress tear": {
+    "scheur in matras": {
       "severity": "minor",
       "steps": [
-        "Remove bedding and inspect the size of the tear.",
-        "For small tears, apply a waterproof mattress repair patch.",
-        "Fit a waterproof mattress protector to prevent moisture getting into the foam.",
-        "If foam is exposed or the tear is longer than a hand's width, request a mattress replacement."
+        "Verwijder het beddengoed en bekijk hoe groot de scheur is.",
+        "Gebruik bij kleine scheuren een waterdichte reparatiepatch voor matrassen.",
+        "Gebruik een waterdichte matrasbeschermer zodat er geen vocht in het schuim komt.",
+        "Is er schuim zichtbaar of is de scheur breder dan een hand, vraag dan een vervangend matras aan."
       ]
     }
   }

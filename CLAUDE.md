@@ -12,7 +12,7 @@ Local chatbot for care-product repair support (wheelchairs, support beds). Users
 - `tickets.jsonl` — append-only ticket log, created at runtime. Contains user PII; gitignored. One JSON object per line.
 - `test_chat.py` — smoke tests with mocked `ollama.chat`; no model/Ollama needed to run.
 
-Model: `qwen2.5:7b-instruct` (constant `MODEL` in `prompt/const.py`). Upgrade path: `qwen2.5:14b-instruct`, one-line swap.
+Model: `qwen2.5:14b-instruct` (constant `MODEL` in `prompt/const.py`). Switched up from `qwen2.5:7b-instruct` — noticeably better Dutch grammar, same tool-calling behavior. Downgrade path if speed matters more than fluency: swap back, one-line change.
 
 ## Key design decisions (don't undo casually)
 
@@ -25,7 +25,7 @@ Model: `qwen2.5:7b-instruct` (constant `MODEL` in `prompt/const.py`). Upgrade pa
 ## Commands
 
 ```bash
-ollama pull qwen2.5:7b-instruct   # once
+ollama pull qwen2.5:14b-instruct   # once
 .venv/bin/pip install -r requirements.txt
 .venv/bin/pytest test_chat.py     # fast, no model needed
 .venv/bin/uvicorn app:app --reload  # http://localhost:8000
