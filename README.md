@@ -113,3 +113,47 @@ Keys are matched lowercase. No code changes needed — the bot picks up new entr
 ## Layout
 
 `app.py` is a thin composition root — the actual routes live in `repair_chat.py`, `product_chat.py`, and `ticket_admin.py` (one router per domain), each with its own session store where relevant. See [`CLAUDE.md`](./CLAUDE.md) for full architecture details and design decisions.
+
+```mermaid
+flowchart TB
+  subgraph FE["Frontend — static/, no build step"]
+    idx["index.html<br/>repair chat"]
+    prod["product.html<br/>rolstoeladvies"]
+    tix["tickets.html<br/>admin list + detail"]
+  end
+
+  subgraph APP["app.py — composition root"]
+    RC["repair_chat.py<br/>GET / · POST /chat"]
+    PC["product_chat.py<br/>GET /product-advies<br/>POST /chat/product"]
+    TA["ticket_admin.py<br/>GET /admin/tickets<br/>GET /api/tickets[/:id]<br/>🔒 HTTP Basic"]
+  end
+
+  OLLAMA[("Ollama<br/>mistral-small")]
+
+  subgraph DOM["domain packages — plain functions, no FastAPI"]
+    REPAIR["repair/<br/>SYSTEM_PROMPT, protocols.json<br/>MODEL, OLLAMA_OPTIONS"]
+    TICKET["ticket/<br/>create_replacement_request<br/>fabricated_fields, lookup_severity"]
+    CUSTOMER["customer/<br/>lookup_customer (read-only)"]
+    PRODUCT["product/<br/>find_suitable_wheelchairs<br/>catalog.json"]
+  end
+
+  PG[("Postgres<br/>customers · tickets")]
+
+  idx --> RC
+  prod --> PC
+  tix --> TA
+
+  RC -- "tools: ticket + customer" --> OLLAMA
+  PC -- "tools: product" --> OLLAMA
+
+  RC --> REPAIR
+  RC --> TICKET
+  RC --> CUSTOMER
+  PC --> PRODUCT
+  PC -. "MODEL, OLLAMA_OPTIONS only" .-> REPAIR
+  TICKET -. "PROTOCOLS, for severity" .-> REPAIR
+
+  TA --> TICKET
+  TICKET --> PG
+  CUSTOMER --> PG
+```

@@ -22,6 +22,87 @@ Local chatbot for care-product repair support (wheelchairs, support beds). Users
 
 Model: `mistral-small` (constant `MODEL` in `repair/const.py`, ~14GB). Switched from `qwen2.5:14b-instruct` — same/better Dutch fluency, and noticeably more reliable structured tool-calling: qwen2.5:14b occasionally skipped `lookup_customer` while claiming it had looked someone up, or leaked a hand-written pseudo tool-call as visible text instead of a real tool call; 5/5 trials on mistral-small produced a clean structured call. One-line swap in `repair/const.py` to try something else later.
 
+### Diagram
+
+```mermaid
+flowchart TB
+  subgraph FE["Frontend — static/, no build step"]
+    idx["index.html<br/>repair chat"]
+    prod["product.html<br/>rolstoeladvies"]
+    tix["tickets.html<br/>admin list + detail"]
+  end
+
+  subgraph APP["app.py — composition root"]
+    RC["repair_chat.py<br/>GET / · POST /chat"]
+    PC["product_chat.py<br/>GET /product-advies<br/>POST /chat/product"]
+    TA["ticket_admin.py<br/>GET /admin/tickets<br/>GET /api/tickets[/:id]<br/>🔒 HTTP Basic"]
+  end
+
+  OLLAMA[("Ollama<br/>mistral-small")]
+
+  subgraph DOM["domain packages — plain functions, no FastAPI"]
+    REPAIR["repair/<br/>SYSTEM_PROMPT, protocols.json<br/>MODEL, OLLAMA_OPTIONS"]
+    TICKET["ticket/<br/>create_replacement_request<br/>fabricated_fields, lookup_severity"]
+    CUSTOMER["customer/<br/>lookup_customer (read-only)"]
+    PRODUCT["product/<br/>find_suitable_wheelchairs<br/>catalog.json"]
+  end
+
+  PG[("Postgres<br/>customers · tickets")]
+
+  idx --> RC
+  prod --> PC
+  tix --> TA
+
+  RC -- "tools: ticket + customer" --> OLLAMA
+  PC -- "tools: product" --> OLLAMA
+
+  RC --> REPAIR
+  RC --> TICKET
+  RC --> CUSTOMER
+  PC --> PRODUCT
+  PC -. "MODEL, OLLAMA_OPTIONS only" .-> REPAIR
+  TICKET -. "PROTOCOLS, for severity" .-> REPAIR
+
+  TA --> TICKET
+  TICKET --> PG
+  CUSTOMER --> PG
+```
+
+Request flow for a repair ticket filed against a known customer — the part worth tracing is what gets verified server-side rather than trusted from the model (see `verified_customers` in Key design decisions below):
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant UI as index.html
+  participant R as repair_chat.py
+  participant M as Ollama
+  participant C as customer/
+  participant T as ticket/
+  participant DB as Postgres
+
+  U->>UI: "I'm Jan Jansen, client 12345,<br/>frame is cracked"
+  UI->>R: POST /chat
+  R->>M: chat(history, tools=[ticket, customer])
+  M-->>R: tool_call lookup_customer
+  R->>C: lookup_customer(name, client_number)
+  C->>DB: SELECT customers
+  DB-->>C: 1 match
+  C-->>R: {match: "single", customer}
+  Note over R: cached in session.verified_customers
+  R->>M: tool result, continue
+  M-->>R: tool_call create_replacement_request
+  Note over R: contact fields overridden<br/>from verified_customers, not the model
+  R->>T: create_replacement_request(args)
+  T->>T: lookup_severity(product, issue)
+  T->>DB: INSERT tickets
+  DB-->>T: ok
+  T-->>R: {ticket_id}
+  R->>M: tool result, continue
+  M-->>R: final reply incl. ticket id
+  R-->>UI: {reply}
+  UI-->>U: shows ticket ID
+```
+
 ## Key design decisions (don't undo casually)
 
 - **Catalog stuffed into system prompt, no RAG.** Catalog is small; keep it that way until it isn't.
