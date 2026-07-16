@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Reparatie-assistent voor zorgproducten</title>
+<title>Rolstoeladvies</title>
 <style>
   * { box-sizing: border-box; margin: 0; }
   body {
@@ -95,15 +95,15 @@
 </head>
 <body>
 <main>
-  <header>🛠️ Reparatie-assistent voor zorgproducten <a href="/product-advies">Op zoek naar een nieuwe rolstoel?</a></header>
+  <header>🦽 Rolstoeladvies <a href="/">Heeft u een defect product?</a></header>
   <div id="messages"></div>
   <form id="form">
-    <textarea id="input" placeholder="Beschrijf het probleem met uw product…" autocomplete="off" autofocus></textarea>
+    <textarea id="input" placeholder="Bijvoorbeeld: ik zoek een rolstoel, ik weeg ongeveer 90 kg…" autocomplete="off" autofocus></textarea>
     <button id="send" type="submit">Versturen</button>
   </form>
 </main>
 <script>
-  const sessionId = localStorage.sessionId ||= crypto.randomUUID();
+  const sessionId = localStorage.productSessionId ||= crypto.randomUUID();
   const messages = document.getElementById("messages");
   const form = document.getElementById("form");
   const input = document.getElementById("input");
@@ -124,7 +124,7 @@
     return div;
   }
 
-  addBubble("Hallo, Ik help u graag bij het repareren van uw zorgproducten, zoals rolstoelen en zorgbedden. Wat is het probleem?", "bot");
+  addBubble("Hallo, ik help u graag de juiste rolstoel te vinden. Wat is ongeveer uw gewicht, en rijdt u zelf of wordt u geduwd?", "bot");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -136,7 +136,7 @@
     send.disabled = input.disabled = true;
     const typing = addBubble("…", "bot");
     try {
-      const res = await fetch("/chat", {
+      const res = await fetch("/chat/product", {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Session-Id": sessionId },
         body: JSON.stringify({ message: text }),

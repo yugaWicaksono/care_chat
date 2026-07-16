@@ -1,0 +1,57 @@
+[
+  {
+    "name": "FlexFold Basic",
+    "type": "Vouwframe rolstoel",
+    "seat_width_cm": [34, 54],
+    "seat_depth_cm": [36, 54],
+    "max_weight_kg": 140,
+    "self_propelled": true,
+    "tilt_in_space": false,
+    "taxi_approved": false,
+    "description": "Lichte vouwframe rolstoel met instelbare zithoogte en rugleuning, geschikt voor gebruikers met een progressief ziektebeeld die baat hebben bij een aanpasbare zitpositie."
+  },
+  {
+    "name": "TiltCare Comfort",
+    "type": "Kantelrolstoel",
+    "seat_width_cm": [40, 54],
+    "seat_depth_cm": [44, 60],
+    "max_weight_kg": 160,
+    "self_propelled": true,
+    "tilt_in_space": true,
+    "taxi_approved": false,
+    "description": "Kantelrolstoel met instelbare wielbasis voor optimale drukverdeling en comfort bij langdurig zitten, geschikt voor gebruikers met beperkte rompbalans."
+  },
+  {
+    "name": "TransportLine Duo",
+    "type": "Transportrolstoel",
+    "seat_width_cm": [52, 58],
+    "seat_depth_cm": [40, 46],
+    "max_weight_kg": 150,
+    "self_propelled": false,
+    "tilt_in_space": false,
+    "taxi_approved": false,
+    "description": "Compacte transportrolstoel, standaard geremd wanneer niet in gebruik en stapelbaar voor efficiënte opslag — bedoeld om door een begeleider geduwd te worden."
+  },
+  {
+    "name": "WideSupport XL",
+    "type": "Rolstoel voor obese cliënten",
+    "seat_width_cm": [55, 75],
+    "seat_depth_cm": [45, 55],
+    "max_weight_kg": 295,
+    "self_propelled": true,
+    "tilt_in_space": false,
+    "taxi_approved": false,
+    "description": "Extra brede en stevige rolstoel met hoge maximale gewichtsbelasting, ontworpen voor gebruikers die een ruimere zitbreedte en robuuste constructie nodig hebben."
+  },
+  {
+    "name": "AdaptFit Pro",
+    "type": "Multi-instelbare rolstoel",
+    "seat_width_cm": [37, 60],
+    "seat_depth_cm": [42, 58],
+    "max_weight_kg": 160,
+    "self_propelled": true,
+    "tilt_in_space": false,
+    "taxi_approved": true,
+    "description": "Veelzijdig instelbare rolstoel met lichtgewicht frame, goedgekeurd voor vervoer in een taxi terwijl de gebruiker erin zit."
+  }
+]

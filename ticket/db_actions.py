@@ -1,13 +1,15 @@
 import psycopg
 from psycopg.rows import dict_row
+
 from db import DATABASE_URL
+
 
 def insert_ticket(ticket: dict) -> None:
     """
     Insert a ticket into the database
     :param ticket: ticket data as dict
     """
-    # ponytail: fresh connection per insert, no pool — same reasoning as find_customer
+    # fresh connection per insert, no pool — same reasoning as find_customer
     with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
             cur.execute(
