@@ -20,7 +20,7 @@ from ticket import (
 BASE = Path(__file__).parent
 
 router = APIRouter()
-#in-memory session store, lost on restart; swap for sqlite if continuity needed
+# in-memory session store, lost on restart; swap for sqlite if continuity needed
 sessions: dict[str, dict] = {}
 
 
