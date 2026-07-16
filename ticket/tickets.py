@@ -3,7 +3,7 @@ import json
 import uuid
 from datetime import datetime, timezone
 
-from prompt.main import PROTOCOLS
+from prompt.prompts import PROTOCOLS
 
 BASE = Path(__file__).parent.parent
 TICKETS = BASE / "tickets.jsonl"
@@ -25,13 +25,20 @@ TOOL_SCHEMA = {
                 "contact_info": {"type": "string", "description": "Phone number or email"},
                 "address": {"type": "string", "description": "Pickup/delivery address"},
                 "notes": {"type": "string", "description": "Item id, serial number or extra notes"},
+                "client_number": {
+                    "type": "string",
+                    "description": (
+                        "If known from a prior lookup_customer call, include it — lets you "
+                        "skip re-collecting contact/address."
+                    ),
+                },
             },
             "required": ["product", "issue", "contact_name", "contact_info", "address"],
         },
     },
 }
 
-TICKET_FIELDS = ("product", "issue", "contact_name", "contact_info", "address", "notes")
+TICKET_FIELDS = ("product", "issue", "contact_name", "contact_info", "address", "notes", "client_number")
 
 def lookup_severity(product: str, issue: str) -> str:
     """

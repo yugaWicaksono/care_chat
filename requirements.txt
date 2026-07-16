@@ -1,5 +1,7 @@
 fastapi
 uvicorn
 ollama
+psycopg[binary]
+python-dotenv
 pytest
 httpx

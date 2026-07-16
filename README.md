@@ -4,20 +4,24 @@ Local chatbot for care-product repair support (wheelchairs, support beds, and si
 
 - **Minor damage** (flat tire, torn upholstery, unresponsive remote, small mattress tear) — bot gives DIY repair steps from a built-in protocol catalog.
 - **Major damage** (cracked frame, brake failure, motor failure, bent frame) — bot explains a temporary replacement will be arranged, collects your contact/pickup details conversationally, confirms with you, then logs a repair ticket.
+- **Returning customer** — if the bot recognizes you by name or client number, it reuses your contact details on file (with a quick confirmation) instead of asking you to retype everything.
 - **Unclear input** — bot asks one clarifying question at a time instead of guessing.
 - **Not in the catalog** — bot says so and offers to log a ticket anyway, rather than inventing repair advice.
 
-Runs entirely local: FastAPI backend + [Ollama](https://ollama.com) for the model, plain HTML/JS frontend. No cloud calls, no accounts.
+Runs local: FastAPI backend + [Ollama](https://ollama.com) for the model, Postgres for customer lookups, plain HTML/JS frontend. No cloud LLM, no accounts.
 
 ## Requirements
 
 - Python 3.10+
 - [Ollama](https://ollama.com) installed and running
+- Docker (for the local Postgres customer database)
 
 ## Setup
 
 ```bash
-ollama pull qwen2.5:14b-instruct
+cp .env.example .env          # adjust credentials if you want, defaults work as-is
+docker compose up -d          # starts Postgres, loads schema + example customers
+ollama pull mistral-small
 
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
@@ -37,20 +41,31 @@ Open **http://localhost:8000** and start chatting.
 .venv/bin/pytest test_chat.py
 ```
 
-No running model needed — `ollama.chat` is mocked.
+No running model or Postgres needed — `ollama.chat` and the customer lookup are both mocked.
 
 ## How it works
 
 1. You describe a problem in the chat box.
-2. The model matches it against `protocols.json` (a catalog of `product → issue → severity + repair steps`).
+2. The model matches it against `prompt/protocols.json` (a catalog of `product → issue → severity + repair steps`).
 3. Minor issues get step-by-step DIY instructions back in chat.
-4. Major issues trigger a conversational intake (name, contact, pickup address), then the bot logs a ticket to `tickets.jsonl` and gives you a ticket ID.
+4. Major issues trigger a customer lookup by name or client number (if not already resolved earlier in the conversation) against Postgres. Found → reuses the details on file after a quick confirmation. Not found → normal conversational intake (name, contact, pickup address). Either way, the bot logs a ticket to `tickets.jsonl` and gives you a ticket ID.
 
 Chat history lives in memory per browser tab (`X-Session-Id`, stored in `localStorage`) and resets if the server restarts. Tickets are the only thing that persist, in `tickets.jsonl` — not committed to git, since it holds contact details.
 
+## Managing customers
+
+The bot only *reads* the customer table — add real customers yourself:
+
+```bash
+docker compose exec db psql -U care_chat -c \
+  "INSERT INTO customers (client_number, name, contact_info, address) VALUES ('1001', 'A. Voorbeeld', 'a@example.com', 'Straat 1, Stad');"
+```
+
+`customer/schema.sql` has the table definition; `customer/seed.sql` has a few example rows loaded automatically the first time the `db` container starts. Connection settings (including `DATABASE_URL`) live in `.env` — not committed, see `.env.example` for the template.
+
 ## Extending the catalog
 
-Add products/issues to `protocols.json`:
+Add products/issues to `prompt/protocols.json`:
 
 ```json
 {

@@ -55,16 +55,22 @@
   }
   form {
     display: flex;
+    align-items: center;
     gap: 0.5rem;
     padding: 1rem;
     border-top: 1px solid #e3e6ea;
   }
-  input {
+  #input {
     flex: 1;
     padding: 0.6rem 0.9rem;
     border: 1px solid #cbd2d9;
-    border-radius: 1.5rem;
+    border-radius: 1.2rem;
     font-size: 1rem;
+    font-family: inherit;
+    line-height: 1.4;
+    resize: none;
+    max-height: 8rem;
+    overflow-y: auto;
   }
   button {
     padding: 0.6rem 1.2rem;
@@ -83,7 +89,7 @@
   <header>🛠️ Reparatie-assistent voor zorgproducten</header>
   <div id="messages"></div>
   <form id="form">
-    <input id="input" placeholder="Beschrijf het probleem met uw product…" autocomplete="off" autofocus>
+    <textarea id="input" placeholder="Beschrijf het probleem met uw product…" autocomplete="off" autofocus></textarea>
     <button id="send" type="submit">Versturen</button>
   </form>
 </main>
@@ -94,6 +100,12 @@
   const input = document.getElementById("input");
   const send = document.getElementById("send");
 
+  function autoResize() {
+    input.style.height = "auto";
+    input.style.height = input.scrollHeight + "px";
+  }
+  input.addEventListener("input", autoResize);
+
   function addBubble(text, who) {
     const div = document.createElement("div");
     div.className = "bubble " + who;
@@ -103,7 +115,7 @@
     return div;
   }
 
-  addBubble("Hoi! Ik help u graag bij het repareren van uw zorgproducten, zoals rolstoelen en zorgbedden. Wat is het probleem?", "bot");
+  addBubble("Hallo, Ik help u graag bij het repareren van uw zorgproducten, zoals rolstoelen en zorgbedden. Wat is het probleem?", "bot");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -111,6 +123,7 @@
     if (!text) return;
     addBubble(text, "user");
     input.value = "";
+    autoResize();
     send.disabled = input.disabled = true;
     const typing = addBubble("…", "bot");
     try {

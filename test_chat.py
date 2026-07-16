@@ -3,7 +3,8 @@ import json
 from fastapi.testclient import TestClient
 
 import app as app_module
-import ticket.main as ticket_main
+import ticket.tickets as ticket_main
+import customer.customers as customer_customers
 from app import app
 
 client = TestClient(app)
@@ -94,3 +95,85 @@ def test_fabricated_contact_details_rejected(monkeypatch, tmp_path):
                       headers={"X-Session-Id": "fabricated-session"})
     assert res.status_code == 200
     assert not tickets.exists()  # no ticket with invented details
+
+
+def test_lookup_customer_then_ticket_uses_stored_details(monkeypatch, tmp_path):
+    tickets = tmp_path / "tickets.jsonl"
+    monkeypatch.setattr(ticket_main, "TICKETS", tickets)
+    monkeypatch.setattr(
+        customer_customers, "find_customer",
+        lambda name=None, client_number=None: [{
+            "client_number": "TEST-001",
+            "name": "Jan Jansen",
+            "contact_info": "jan@example.test",
+            "address": "Teststraat 1, Amsterdam",
+        }],
+    )
+    lookup_call = {"function": {"name": "lookup_customer", "arguments": {"name": "Jan Jansen"}}}
+    ticket_call = {
+        "function": {
+            "name": "log_replacement_request",
+            "arguments": {
+                "product": "rolstoel",
+                "issue": "scheur in frame",
+                "contact_name": "onbekend",
+                "contact_info": "onbekend",
+                "address": "onbekend",
+                "client_number": "TEST-001",
+            },
+        }
+    }
+    monkeypatch.setattr(
+        app_module.ollama, "chat",
+        fake_chat(
+            {"message": {"role": "assistant", "content": "", "tool_calls": [lookup_call]}},
+            {"message": {"role": "assistant", "content": "Ik heb je gevonden, Jan."}},
+            {"message": {"role": "assistant", "content": "", "tool_calls": [ticket_call]}},
+            {"message": {"role": "assistant", "content": "Ticket aangemaakt."}},
+        ),
+    )
+    session_id = "customer-session"
+    res1 = client.post("/chat", json={"message": "Ik ben Jan Jansen"},
+                       headers={"X-Session-Id": session_id})
+    assert res1.status_code == 200
+
+    res2 = client.post("/chat", json={"message": "ja, klopt"},
+                       headers={"X-Session-Id": session_id})
+    assert res2.status_code == 200
+
+    lines = tickets.read_text().splitlines()
+    assert len(lines) == 1
+    ticket = json.loads(lines[0])
+    assert ticket["contact_name"] == "Jan Jansen"  # from the DB, not the model's "onbekend"
+    assert ticket["contact_info"] == "jan@example.test"
+    assert ticket["address"] == "Teststraat 1, Amsterdam"
+    assert ticket["client_number"] == "TEST-001"
+
+
+def test_client_number_without_lookup_still_requires_fabrication_guard(monkeypatch, tmp_path):
+    tickets = tmp_path / "tickets.jsonl"
+    monkeypatch.setattr(ticket_main, "TICKETS", tickets)
+    tool_call = {
+        "function": {
+            "name": "log_replacement_request",
+            "arguments": {
+                "product": "rolstoel",
+                "issue": "scheur in frame",
+                "contact_name": "John Doe",
+                "contact_info": "john.doe@example.com",
+                "address": "123 Main St, Anytown USA",
+                "client_number": "TEST-001",
+            },
+        }
+    }
+    monkeypatch.setattr(
+        app_module.ollama, "chat",
+        fake_chat(
+            {"message": {"role": "assistant", "content": "", "tool_calls": [tool_call]}},
+            {"message": {"role": "assistant", "content": "Kun je je gegevens geven?"}},
+        ),
+    )
+    res = client.post("/chat", json={"message": "het frame is gescheurd"},
+                      headers={"X-Session-Id": "unverified-client-number-session"})
+    assert res.status_code == 200
+    assert not tickets.exists()
