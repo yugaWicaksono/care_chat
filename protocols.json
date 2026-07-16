@@ -1,0 +1,71 @@
+{
+  "wheelchair": {
+    "flat tire": {
+      "severity": "minor",
+      "steps": [
+        "Ensure the wheelchair is stable and the user is not seated in it.",
+        "Check if the tire is punctured or just deflated; inflate to the pressure printed on the tire sidewall.",
+        "If punctured, remove the wheel using the quick-release axle or wrench.",
+        "Replace the inner tube or use a patch kit on the puncture.",
+        "Refit the wheel and confirm it spins freely and brakes grip properly."
+      ]
+    },
+    "brake failure": {
+      "severity": "major",
+      "steps": [
+        "Stop using the wheelchair immediately; failing brakes are a safety risk.",
+        "Do not attempt to ride the wheelchair until it has been serviced."
+      ]
+    },
+    "frame crack": {
+      "severity": "major",
+      "steps": [
+        "Stop using the wheelchair immediately; a cracked frame can collapse.",
+        "Do not attempt a DIY weld or brace."
+      ]
+    },
+    "torn upholstery": {
+      "severity": "minor",
+      "steps": [
+        "Check whether the tear affects the seat's support; small surface tears are cosmetic.",
+        "Clean the area around the tear with mild soap and let it dry.",
+        "Apply a vinyl/fabric repair patch over the tear, pressing firmly.",
+        "If the tear is larger than a hand's width or the seat sags, request a seat replacement."
+      ]
+    }
+  },
+  "support bed": {
+    "motor failure": {
+      "severity": "major",
+      "steps": [
+        "Unplug the bed from mains power.",
+        "Do not open the motor housing; it must be serviced by a technician."
+      ]
+    },
+    "remote unresponsive": {
+      "severity": "minor",
+      "steps": [
+        "Check the remote's cable is firmly plugged into the control box under the bed.",
+        "Replace the remote's batteries if it is a wireless model.",
+        "Unplug the bed from mains power for 60 seconds, then plug back in to reset the control box.",
+        "Test each button; if only some buttons fail, the remote itself needs replacement."
+      ]
+    },
+    "frame bent": {
+      "severity": "major",
+      "steps": [
+        "Stop adjusting the bed; a bent frame can jam the motor or collapse.",
+        "Keep the bed in a flat, stable position until it is serviced."
+      ]
+    },
+    "mattress tear": {
+      "severity": "minor",
+      "steps": [
+        "Remove bedding and inspect the size of the tear.",
+        "For small tears, apply a waterproof mattress repair patch.",
+        "Fit a waterproof mattress protector to prevent moisture getting into the foam.",
+        "If foam is exposed or the tear is longer than a hand's width, request a mattress replacement."
+      ]
+    }
+  }
+}
