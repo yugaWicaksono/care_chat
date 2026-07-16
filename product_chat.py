@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 from chat_types import ChatIn
 from product import PRODUCT_SYSTEM_PROMPT, find_suitable_wheelchairs
 from product import TOOL_SCHEMA as PRODUCT_TOOL_SCHEMA
-from prompt import MODEL, OLLAMA_OPTIONS
+from repair import MODEL, OLLAMA_OPTIONS
 
 BASE = Path(__file__).parent
 

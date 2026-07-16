@@ -55,7 +55,7 @@ No running model or Postgres needed — `ollama.chat`, the customer lookup, and 
 
 **Repair chat** (`/`, posts to `/chat`):
 1. You describe a problem in the chat box.
-2. The model matches it against `prompt/protocols.json` (a catalog of `product → issue → severity + repair steps`).
+2. The model matches it against `repair/protocols.json` (a catalog of `product → issue → severity + repair steps`).
 3. Minor issues get step-by-step DIY instructions back in chat.
 4. Major issues trigger a customer lookup by name or client number (if not already resolved earlier in the conversation) against Postgres. Found → reuses the details on file after a quick confirmation. Not found → normal conversational intake (name, contact, pickup address). Either way, the bot logs a ticket to the `tickets` table in Postgres and gives you a ticket ID.
 
@@ -91,7 +91,7 @@ docker compose exec db psql -U care_chat -c "SELECT * FROM tickets ORDER BY crea
 
 ## Extending the catalog
 
-Add products/issues to `prompt/protocols.json`:
+Add products/issues to `repair/protocols.json`:
 
 ```json
 {

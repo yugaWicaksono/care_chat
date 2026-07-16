@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 from chat_types import ChatIn
 from customer import TOOL_SCHEMA as CUSTOMER_TOOL_SCHEMA
 from customer import lookup_customer
-from prompt import MODEL, OLLAMA_OPTIONS, SYSTEM_PROMPT
+from repair import MODEL, OLLAMA_OPTIONS, SYSTEM_PROMPT
 from ticket import (
     TOOL_SCHEMA as TICKET_TOOL_SCHEMA,
 )

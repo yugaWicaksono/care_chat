@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from prompt.prompts import PROTOCOLS
+from repair.prompts import PROTOCOLS
 
 from .db_actions import insert_ticket
 from .util import generate_ticket_id
