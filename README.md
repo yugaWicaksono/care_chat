@@ -45,6 +45,12 @@ Open **http://localhost:8000** for the repair chat, or **http://localhost:8000/p
 
 No running model or Postgres needed — `ollama.chat`, the customer lookup, and the ticket insert are all mocked.
 
+## Lint
+
+```bash
+.venv/bin/ruff check .          # add --fix for the auto-fixable ones
+```
+
 ## How it works
 
 **Repair chat** (`/`, posts to `/chat`):
@@ -106,4 +112,4 @@ Keys are matched lowercase. No code changes needed — the bot picks up new entr
 
 ## Layout
 
-See [`CLAUDE.md`](./CLAUDE.md) for architecture details and design decisions.
+`app.py` is a thin composition root — the actual routes live in `repair_chat.py`, `product_chat.py`, and `ticket_admin.py` (one router per domain), each with its own session store where relevant. See [`CLAUDE.md`](./CLAUDE.md) for full architecture details and design decisions.

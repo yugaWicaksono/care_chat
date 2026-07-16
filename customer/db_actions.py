@@ -3,6 +3,7 @@ from psycopg.rows import dict_row
 
 from db import DATABASE_URL
 
+
 def find_customer(name: str | None = None, client_number: str | None = None) -> list[dict]:
     """
     Find customer based on the client number or name

@@ -19,15 +19,24 @@ TOOL_SCHEMA = {
                 "height_cm": {"type": "number", "description": "User's approximate height in cm, if known"},
                 "self_propelled": {
                     "type": "boolean",
-                    "description": "true if the user will propel the wheelchair themselves, false if a caregiver pushes it",
+                    "description": (
+                        "true if the user will propel the wheelchair themselves, "
+                        "false if a caregiver pushes it"
+                    ),
                 },
                 "needs_tilt": {
                     "type": "boolean",
-                    "description": "true if the user needs tilt-in-space/recline support, e.g. for pressure relief or limited trunk control",
+                    "description": (
+                        "true if the user needs tilt-in-space/recline support, e.g. for "
+                        "pressure relief or limited trunk control"
+                    ),
                 },
                 "taxi_transport": {
                     "type": "boolean",
-                    "description": "true if the wheelchair needs to be crash-tested for transport in a taxi/vehicle while occupied",
+                    "description": (
+                        "true if the wheelchair needs to be crash-tested for transport "
+                        "in a taxi/vehicle while occupied"
+                    ),
                 },
             },
         },
