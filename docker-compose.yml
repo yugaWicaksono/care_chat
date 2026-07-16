@@ -9,8 +9,9 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./customer/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
-      - ./customer/seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
+      - ./customer/schema.sql:/docker-entrypoint-initdb.d/1-customer-schema.sql
+      - ./customer/seed.sql:/docker-entrypoint-initdb.d/2-customer-seed.sql
+      - ./ticket/schema.sql:/docker-entrypoint-initdb.d/3-ticket-schema.sql
 
 volumes:
   pgdata:

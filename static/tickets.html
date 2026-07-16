@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tickets — beheer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: system-ui, sans-serif;
+    background: #f2f4f7;
+    color: #111;
+    padding: 1.5rem;
+  }
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+  header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e3e6ea;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #back {
+    display: none;
+    background: none;
+    border: none;
+    color: #2563eb;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e3e6ea;
+    font-size: 0.9rem;
+  }
+  th { color: #667; font-weight: 600; }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: #f7f9fb; }
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .badge.major { background: #fde2e2; color: #b42318; }
+  .badge.minor { background: #e2f5e9; color: #15803d; }
+  .badge.unknown { background: #e9edf2; color: #445; }
+  #detail { padding: 1.5rem; display: none; }
+  #detail .summary {
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid #e3e6ea;
+  }
+  #detail .summary h2 { font-size: 1.3rem; }
+  #detail .summary .address { color: #445; margin-top: 0.2rem; }
+  #detail .summary .problem { margin-top: 0.6rem; font-size: 1.05rem; }
+  #detail dl {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    gap: 0.6rem 1rem;
+  }
+  #detail dt { color: #667; font-weight: 600; }
+  #detail dd { word-break: break-word; }
+  #empty { padding: 2rem 1.5rem; color: #667; }
+</style>
+</head>
+<body>
+<main>
+  <header><span id="title">🎫 Tickets</span><button id="back">&larr; terug naar lijst</button></header>
+  <table id="list">
+    <thead>
+      <tr><th>Aangemaakt</th><th>Product</th><th>Probleem</th><th>Ernst</th><th>Naam</th></tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div id="empty" style="display:none">Nog geen tickets.</div>
+  <div id="detail"></div>
+</main>
+<script>
+  const list = document.getElementById("list");
+  const rows = document.getElementById("rows");
+  const empty = document.getElementById("empty");
+  const detail = document.getElementById("detail");
+  const back = document.getElementById("back");
+  const title = document.getElementById("title");
+
+  function escape(string) {
+    return String(string ?? "").replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    }[c]));
+  }
+
+  function formatDate(iso) {
+    return new Date(iso).toLocaleString("nl-NL");
+  }
+
+  function badge(severity) {
+    const cls = ["minor", "major"].includes(severity) ? severity : "unknown";
+    return `<span class="badge ${cls}">${severity}</span>`;
+  }
+
+  function showList() {
+    detail.style.display = "none";
+    list.style.display = "";
+    back.style.display = "none";
+    title.textContent = "🎫 Tickets";
+    history.replaceState(null, "", "/admin/tickets");
+  }
+
+  function showDetail(ticket) {
+    list.style.display = "none";
+    empty.style.display = "none";
+    back.style.display = "inline-block";
+    title.textContent = "Ticket " + ticket.ticket_id;
+    detail.style.display = "block";
+    detail.innerHTML = `
+      <div class="summary">
+        <h2>${escape(ticket.contact_name)}</h2>
+        <div class="address">${escape(ticket.address)}</div>
+        <div class="problem">${escape(ticket.product)} — ${escape(ticket.issue)} ${badge(ticket.severity)}</div>
+      </div>
+      <dl>
+        <dt>Ticket ID</dt><dd>${escape(ticket.ticket_id)}</dd>
+        <dt>Aangemaakt</dt><dd>${escape(formatDate(ticket.created_at))}</dd>
+        <dt>Contact</dt><dd>${escape(ticket.contact_info)}</dd>
+        <dt>Klantnummer</dt><dd>${escape(ticket.client_number) || "—"}</dd>
+        <dt>Notities</dt><dd>${escape(ticket.notes) || "—"}</dd>
+      </dl>`;
+  }
+
+  async function openTicket(id) {
+    const res = await fetch(`/api/tickets/${id}`);
+    if (!res.ok) return;
+    showDetail(await res.json());
+  }
+
+  back.addEventListener("click", showList);
+
+  fetch("/api/tickets")
+    .then((res) => res.json())
+    .then((tickets) => {
+      if (tickets.length === 0) {
+        list.style.display = "none";
+        empty.style.display = "";
+        return;
+      }
+      for (const ticket of tickets) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escape(formatDate(ticket.created_at))}</td><td>${escape(ticket.product)}</td><td>${escape(ticket.issue)}</td>
+          <td>${badge(ticket.severity)}</td><td>${escape(ticket.contact_name)}</td>`;
+        tr.addEventListener("click", () => openTicket(ticket.ticket_id));
+        rows.appendChild(tr);
+      }
+    });
+</script>
+</body>
+</html>

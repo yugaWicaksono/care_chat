@@ -1,21 +1,47 @@
 import json
+import os
+import secrets
 
 import ollama
-from fastapi import FastAPI, Header
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.responses import FileResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
 
 from pathlib import Path
 
 from prompt import SYSTEM_PROMPT, MODEL, OLLAMA_OPTIONS
-from ticket import TOOL_SCHEMA as TICKET_TOOL_SCHEMA, fabricated_fields, log_replacement_request
+from ticket import (
+    TOOL_SCHEMA as TICKET_TOOL_SCHEMA,
+    fabricated_fields,
+    create_replacement_request,
+    list_tickets,
+    get_ticket,
+)
 from customer import TOOL_SCHEMA as CUSTOMER_TOOL_SCHEMA, lookup_customer
+
+load_dotenv()
 
 BASE = Path(__file__).parent
 
 app = FastAPI()
 #in-memory session store, lost on restart; swap for sqlite if continuity needed
 sessions: dict[str, dict] = {}
+
+security = HTTPBasic()
+ADMIN_USER = os.environ.get("ADMIN_USER", "admin")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+
+
+def require_admin(credentials: HTTPBasicCredentials = Depends(security)) -> None:
+    if not ADMIN_PASSWORD:
+        raise HTTPException(500, "ADMIN_PASSWORD not set — add it to .env")
+    valid = secrets.compare_digest(credentials.username, ADMIN_USER) and secrets.compare_digest(
+        credentials.password, ADMIN_PASSWORD
+    )
+    if not valid:
+        raise HTTPException(401, "Unauthorized", headers={"WWW-Authenticate": "Basic"})
 
 
 class ChatIn(BaseModel):
@@ -25,6 +51,24 @@ class ChatIn(BaseModel):
 @app.get("/")
 def index():
     return FileResponse(BASE / "static" / "index.html")
+
+
+@app.get("/admin/tickets")
+def admin_tickets_page(_: None = Depends(require_admin)):
+    return FileResponse(BASE / "static" / "tickets.html")
+
+
+@app.get("/api/tickets")
+def api_tickets_list(_: None = Depends(require_admin)):
+    return list_tickets()
+
+
+@app.get("/api/tickets/{ticket_id}")
+def api_ticket_detail(ticket_id: str, _: None = Depends(require_admin)):
+    ticket = get_ticket(ticket_id)
+    if not ticket:
+        raise HTTPException(404, "ticket not found")
+    return ticket
 
 
 @app.post("/chat")
@@ -47,7 +91,7 @@ def chat(body: ChatIn, x_session_id: str = Header(...)):
             args = call["function"]["arguments"]
             if isinstance(args, str):
                 args = json.loads(args)
-            if name == "log_replacement_request":
+            if name == "create_replacement_request":
                 verified = session["verified_customers"].get(args.get("client_number"))
                 if verified:
                     # server-held customer record wins over whatever the model claims
@@ -58,7 +102,7 @@ def chat(body: ChatIn, x_session_id: str = Header(...)):
                         "address": verified["address"],
                         "client_number": verified["client_number"],
                     }
-                    result = log_replacement_request(args)
+                    result = create_replacement_request(args)
                 else:
                     bad = fabricated_fields(args, history)
                     if bad:
@@ -67,7 +111,7 @@ def chat(body: ChatIn, x_session_id: str = Header(...)):
                             "conversation. Ask the user for their real details — never guess."
                         }
                     else:
-                        result = log_replacement_request(args)
+                        result = create_replacement_request(args)
             elif name == "lookup_customer":
                 result = lookup_customer(args)
                 if result.get("match") == "single":

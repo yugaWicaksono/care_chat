@@ -1,5 +1,3 @@
-import json
-
 from fastapi.testclient import TestClient
 
 import app as app_module
@@ -15,9 +13,14 @@ def fake_chat(*responses):
     return lambda **kwargs: next(it)
 
 
-def test_minor_path_writes_no_ticket(monkeypatch, tmp_path):
-    tickets = tmp_path / "tickets.jsonl"
-    monkeypatch.setattr(ticket_main, "TICKETS", tickets)
+def capture_tickets(monkeypatch):
+    tickets = []
+    monkeypatch.setattr(ticket_main, "insert_ticket", tickets.append)
+    return tickets
+
+
+def test_minor_path_writes_no_ticket(monkeypatch):
+    tickets = capture_tickets(monkeypatch)
     monkeypatch.setattr(
         app_module.ollama, "chat",
         fake_chat({"message": {"role": "assistant", "content": "Here are the repair steps."}}),
@@ -26,15 +29,14 @@ def test_minor_path_writes_no_ticket(monkeypatch, tmp_path):
                       headers={"X-Session-Id": "minor-session"})
     assert res.status_code == 200
     assert res.json()["reply"] == "Here are the repair steps."
-    assert not tickets.exists()
+    assert not tickets
 
 
-def test_major_path_writes_ticket_with_server_severity(monkeypatch, tmp_path):
-    tickets = tmp_path / "tickets.jsonl"
-    monkeypatch.setattr(ticket_main, "TICKETS", tickets)
+def test_major_path_writes_ticket_with_server_severity(monkeypatch):
+    tickets = capture_tickets(monkeypatch)
     tool_call = {
         "function": {
-            "name": "log_replacement_request",
+            "name": "create_replacement_request",
             "arguments": {
                 "product": "Rolstoel",
                 "issue": "scheur in frame",
@@ -60,21 +62,19 @@ def test_major_path_writes_ticket_with_server_severity(monkeypatch, tmp_path):
     assert res.status_code == 200
     assert res.json()["reply"] == "Ticket logged, replacement on the way."
 
-    lines = tickets.read_text().splitlines()
-    assert len(lines) == 1
-    ticket = json.loads(lines[0])
+    assert len(tickets) == 1
+    ticket = tickets[0]
     assert ticket["severity"] == "major"  # resolved server-side from protocols.json
     assert ticket["product"] == "Rolstoel"
     assert ticket["contact_name"] == "Alex"
     assert ticket["ticket_id"]
 
 
-def test_fabricated_contact_details_rejected(monkeypatch, tmp_path):
-    tickets = tmp_path / "tickets.jsonl"
-    monkeypatch.setattr(ticket_main, "TICKETS", tickets)
+def test_fabricated_contact_details_rejected(monkeypatch):
+    tickets = capture_tickets(monkeypatch)
     tool_call = {
         "function": {
-            "name": "log_replacement_request",
+            "name": "create_replacement_request",
             "arguments": {
                 "product": "rolstoel",
                 "issue": "scheur in frame",
@@ -94,12 +94,11 @@ def test_fabricated_contact_details_rejected(monkeypatch, tmp_path):
     res = client.post("/chat", json={"message": "the frame is cracked"},
                       headers={"X-Session-Id": "fabricated-session"})
     assert res.status_code == 200
-    assert not tickets.exists()  # no ticket with invented details
+    assert not tickets  # no ticket with invented details
 
 
-def test_lookup_customer_then_ticket_uses_stored_details(monkeypatch, tmp_path):
-    tickets = tmp_path / "tickets.jsonl"
-    monkeypatch.setattr(ticket_main, "TICKETS", tickets)
+def test_lookup_customer_then_ticket_uses_stored_details(monkeypatch):
+    tickets = capture_tickets(monkeypatch)
     monkeypatch.setattr(
         customer_customers, "find_customer",
         lambda name=None, client_number=None: [{
@@ -112,7 +111,7 @@ def test_lookup_customer_then_ticket_uses_stored_details(monkeypatch, tmp_path):
     lookup_call = {"function": {"name": "lookup_customer", "arguments": {"name": "Jan Jansen"}}}
     ticket_call = {
         "function": {
-            "name": "log_replacement_request",
+            "name": "create_replacement_request",
             "arguments": {
                 "product": "rolstoel",
                 "issue": "scheur in frame",
@@ -141,21 +140,19 @@ def test_lookup_customer_then_ticket_uses_stored_details(monkeypatch, tmp_path):
                        headers={"X-Session-Id": session_id})
     assert res2.status_code == 200
 
-    lines = tickets.read_text().splitlines()
-    assert len(lines) == 1
-    ticket = json.loads(lines[0])
+    assert len(tickets) == 1
+    ticket = tickets[0]
     assert ticket["contact_name"] == "Jan Jansen"  # from the DB, not the model's "onbekend"
     assert ticket["contact_info"] == "jan@example.test"
     assert ticket["address"] == "Teststraat 1, Amsterdam"
     assert ticket["client_number"] == "TEST-001"
 
 
-def test_client_number_without_lookup_still_requires_fabrication_guard(monkeypatch, tmp_path):
-    tickets = tmp_path / "tickets.jsonl"
-    monkeypatch.setattr(ticket_main, "TICKETS", tickets)
+def test_client_number_without_lookup_still_requires_fabrication_guard(monkeypatch):
+    tickets = capture_tickets(monkeypatch)
     tool_call = {
         "function": {
-            "name": "log_replacement_request",
+            "name": "create_replacement_request",
             "arguments": {
                 "product": "rolstoel",
                 "issue": "scheur in frame",
@@ -176,4 +173,4 @@ def test_client_number_without_lookup_still_requires_fabrication_guard(monkeypat
     res = client.post("/chat", json={"message": "het frame is gescheurd"},
                       headers={"X-Session-Id": "unverified-client-number-session"})
     assert res.status_code == 200
-    assert not tickets.exists()
+    assert not tickets

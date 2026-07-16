@@ -3,8 +3,6 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .idea
-# runtime data, contains user PII
-tickets.jsonl
 
 .env
 .DS_Store

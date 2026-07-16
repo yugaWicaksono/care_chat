@@ -8,19 +8,19 @@ Local chatbot for care-product repair support (wheelchairs, support beds, and si
 - **Unclear input** — bot asks one clarifying question at a time instead of guessing.
 - **Not in the catalog** — bot says so and offers to log a ticket anyway, rather than inventing repair advice.
 
-Runs local: FastAPI backend + [Ollama](https://ollama.com) for the model, Postgres for customer lookups, plain HTML/JS frontend. No cloud LLM, no accounts.
+Runs local: FastAPI backend + [Ollama](https://ollama.com) for the model, Postgres for customers and tickets, plain HTML/JS frontend. No cloud LLM, no accounts.
 
 ## Requirements
 
 - Python 3.10+
 - [Ollama](https://ollama.com) installed and running
-- Docker (for the local Postgres customer database)
+- Docker (for the local Postgres database)
 
 ## Setup
 
 ```bash
-cp .env.example .env          # adjust credentials if you want, defaults work as-is
-docker compose up -d          # starts Postgres, loads schema + example customers
+cp .env.example .env          # set ADMIN_PASSWORD; Postgres defaults work as-is
+docker compose up -d          # starts Postgres, loads customer + ticket schemas + example customers
 ollama pull mistral-small
 
 python3 -m venv .venv
@@ -41,16 +41,16 @@ Open **http://localhost:8000** and start chatting.
 .venv/bin/pytest test_chat.py
 ```
 
-No running model or Postgres needed — `ollama.chat` and the customer lookup are both mocked.
+No running model or Postgres needed — `ollama.chat`, the customer lookup, and the ticket insert are all mocked.
 
 ## How it works
 
 1. You describe a problem in the chat box.
 2. The model matches it against `prompt/protocols.json` (a catalog of `product → issue → severity + repair steps`).
 3. Minor issues get step-by-step DIY instructions back in chat.
-4. Major issues trigger a customer lookup by name or client number (if not already resolved earlier in the conversation) against Postgres. Found → reuses the details on file after a quick confirmation. Not found → normal conversational intake (name, contact, pickup address). Either way, the bot logs a ticket to `tickets.jsonl` and gives you a ticket ID.
+4. Major issues trigger a customer lookup by name or client number (if not already resolved earlier in the conversation) against Postgres. Found → reuses the details on file after a quick confirmation. Not found → normal conversational intake (name, contact, pickup address). Either way, the bot logs a ticket to the `tickets` table in Postgres and gives you a ticket ID.
 
-Chat history lives in memory per browser tab (`X-Session-Id`, stored in `localStorage`) and resets if the server restarts. Tickets are the only thing that persist, in `tickets.jsonl` — not committed to git, since it holds contact details.
+Chat history lives in memory per browser tab (`X-Session-Id`, stored in `localStorage`) and resets if the server restarts. Tickets and customers are the durable data, both in Postgres.
 
 ## Managing customers
 
@@ -62,6 +62,18 @@ docker compose exec db psql -U care_chat -c \
 ```
 
 `customer/schema.sql` has the table definition; `customer/seed.sql` has a few example rows loaded automatically the first time the `db` container starts. Connection settings (including `DATABASE_URL`) live in `.env` — not committed, see `.env.example` for the template.
+
+## Viewing tickets
+
+Open **http://localhost:8000/admin/tickets** — a simple list + detail page, protected by HTTP Basic auth using the `ADMIN_USER`/`ADMIN_PASSWORD` you set in `.env`. This is the one part of the app with any auth, since it shows every customer's contact info in one place.
+
+Or query directly:
+
+```bash
+docker compose exec db psql -U care_chat -c "SELECT * FROM tickets ORDER BY created_at DESC;"
+```
+
+`ticket/schema.sql` has the table definition.
 
 ## Extending the catalog
 

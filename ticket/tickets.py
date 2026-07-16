@@ -1,17 +1,12 @@
-from pathlib import Path
-import json
-import uuid
 from datetime import datetime, timezone
-
 from prompt.prompts import PROTOCOLS
-
-BASE = Path(__file__).parent.parent
-TICKETS = BASE / "tickets.jsonl"
+from .db_actions import insert_ticket
+from .util import generate_ticket_id
 
 TOOL_SCHEMA = {
     "type": "function",
     "function": {
-        "name": "log_replacement_request",
+        "name": "create_replacement_request",
         "description": (
             "Log a repair ticket: arranges a temporary replacement and pickup of the "
             "damaged item. Only call after the user has confirmed their details."
@@ -66,16 +61,15 @@ def fabricated_fields(args: dict, history: list) -> list[str]:
         if not str(args.get(field, "")).strip() or str(args[field]).casefold() not in user_text
     ]
 
-def log_replacement_request(args: dict) -> dict:
+def create_replacement_request(args: dict) -> dict:
     """
-    Method to log a repair request
+    Method to create a repair request and save it in the database
     :param args: output from the model based on the user chat
     :return:
     """
     ticket = {field: str(args.get(field, "")) for field in TICKET_FIELDS}
-    ticket["ticket_id"] = str(uuid.uuid4())
-    ticket["created_at"] = datetime.now(timezone.utc).isoformat()
+    ticket["ticket_id"] = generate_ticket_id()
+    ticket["created_at"] = datetime.now(timezone.utc)
     ticket["severity"] = lookup_severity(ticket["product"], ticket["issue"])
-    with TICKETS.open("a") as f:
-        f.write(json.dumps(ticket) + "\n")
+    insert_ticket(ticket)
     return {"ticket_id": ticket["ticket_id"], "status": "replacement arranged, pickup scheduled"}

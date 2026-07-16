@@ -1,7 +1,4 @@
-import psycopg
-from psycopg.rows import dict_row
-
-from customer.db import DATABASE_URL
+from .db_actions import find_customer
 
 TOOL_SCHEMA = {
     "type": "function",
@@ -22,29 +19,6 @@ TOOL_SCHEMA = {
         },
     },
 }
-
-
-def find_customer(name: str | None = None, client_number: str | None = None) -> list[dict]:
-    # ponytail: fresh connection per lookup, no pool — occasional single-user queries, add
-    # psycopg_pool only if concurrency ever actually shows up as a bottleneck
-    with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
-        with conn.cursor() as cur:
-            if client_number:
-                cur.execute(
-                    "SELECT client_number, name, contact_info, address FROM customers "
-                    "WHERE lower(client_number) = lower(%s)",
-                    (client_number,),
-                )
-            elif name:
-                cur.execute(
-                    "SELECT client_number, name, contact_info, address FROM customers "
-                    "WHERE name ILIKE %s",
-                    (f"%{name}%",),
-                )
-            else:
-                return []
-            return cur.fetchall()
-
 
 def lookup_customer(args: dict) -> dict:
     matches = find_customer(name=args.get("name"), client_number=args.get("client_number"))
