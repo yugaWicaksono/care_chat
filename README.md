@@ -1,4 +1,4 @@
-# care_chat
+# care chat
 
 Local chatbot for care-product repair support (wheelchairs, support beds, and similar equipment). Describe what's wrong and the bot walks you through it:
 
