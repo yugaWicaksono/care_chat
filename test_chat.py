@@ -174,3 +174,26 @@ def test_client_number_without_lookup_still_requires_fabrication_guard(monkeypat
                       headers={"X-Session-Id": "unverified-client-number-session"})
     assert res.status_code == 200
     assert not tickets
+
+
+def test_product_chat_calls_wheelchair_matcher(monkeypatch):
+    tool_call = {
+        "function": {
+            "name": "find_suitable_wheelchairs",
+            "arguments": {"weight_kg": 90, "self_propelled": True},
+        }
+    }
+    monkeypatch.setattr(
+        app_module.ollama, "chat",
+        fake_chat(
+            {"message": {"role": "assistant", "content": "", "tool_calls": [tool_call]}},
+            {"message": {"role": "assistant", "content": "Deze rolstoelen passen bij u."}},
+        ),
+    )
+    res = client.post(
+        "/chat/product",
+        json={"message": "Ik weeg ongeveer 90 kg en rijd zelf"},
+        headers={"X-Session-Id": "product-session"},
+    )
+    assert res.status_code == 200
+    assert res.json()["reply"] == "Deze rolstoelen passen bij u."
