@@ -2,7 +2,7 @@ import json
 
 from .products import CATALOG
 
-WHEELCHAIR_CATALOG = [p for p in CATALOG if p["category"] == "wheelchair"]
+WHEELCHAIR_CATALOG = [product for product in CATALOG if product["category"] == "wheelchair"]
 
 PRODUCT_SYSTEM_PROMPT = f"""You are a friendly, patient product advisor for wheelchairs. \
 You help people who don't yet have a suitable wheelchair figure out which type fits them, \
