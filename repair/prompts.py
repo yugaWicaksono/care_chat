@@ -1,8 +1,10 @@
 import json
 from pathlib import Path
 
+from product import CATALOG
+
 """
-This is the main system prompt where the user chat will be process and send to 
+This is the main system prompt where the user chat will be process and send to
 ollama / LLMmodel
 
 The core function of this chat app
@@ -16,6 +18,11 @@ wrong with their product and what to do about it.
 
 Repair protocol catalog (the ONLY source of repair advice you may use):
 {json.dumps(PROTOCOLS, indent=2)}
+
+Known product models (background reference only — use this to recognize a model the user \
+names and confirm details like its max weight or type; this is NOT a source of repair steps \
+or severity — those only ever come from the repair protocol catalog above):
+{json.dumps(CATALOG, indent=2)}
 
 Rules:
 - CRITICAL: writing that you looked someone up, found their details, filed a ticket, \
