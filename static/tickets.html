@@ -131,11 +131,12 @@
       <div class="summary">
         <h2>${escape(ticket.contact_name)}</h2>
         <div class="address">${escape(ticket.address)}</div>
-        <div class="problem">${escape(ticket.product)} — ${escape(ticket.issue)} ${badge(ticket.severity)}</div>
+        <div class="problem">${escape(ticket.product)}${ticket.product_model ? " (" + escape(ticket.product_model) + ")" : ""} — ${escape(ticket.issue)} ${badge(ticket.severity)}</div>
       </div>
       <dl>
         <dt>Ticket ID</dt><dd>${escape(ticket.ticket_id)}</dd>
         <dt>Aangemaakt</dt><dd>${escape(formatDate(ticket.created_at))}</dd>
+        <dt>Model</dt><dd>${escape(ticket.product_model) || "—"}</dd>
         <dt>Contact</dt><dd>${escape(ticket.contact_info)}</dd>
         <dt>Klantnummer</dt><dd>${escape(ticket.client_number) || "—"}</dd>
         <dt>Notities</dt><dd>${escape(ticket.notes) || "—"}</dd>

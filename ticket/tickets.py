@@ -17,6 +17,13 @@ TOOL_SCHEMA = {
             "type": "object",
             "properties": {
                 "product": {"type": "string", "description": "Product type, e.g. wheelchair"},
+                "product_model": {
+                    "type": "string",
+                    "description": (
+                        "The specific catalog model name if the user named or confirmed one "
+                        "(e.g. 'BariatricRest XL'). Leave empty if unknown — never guess."
+                    ),
+                },
                 "issue": {"type": "string", "description": "The issue, matching a catalog entry if possible"},
                 "contact_name": {"type": "string", "description": "User's full name"},
                 "contact_info": {"type": "string", "description": "Phone number or email"},
@@ -35,7 +42,10 @@ TOOL_SCHEMA = {
     },
 }
 
-TICKET_FIELDS = ("product", "issue", "contact_name", "contact_info", "address", "notes", "client_number")
+TICKET_FIELDS = (
+    "product", "product_model", "issue", "contact_name", "contact_info", "address", "notes",
+    "client_number",
+)
 
 def lookup_severity(product: str, issue: str) -> str:
     """
