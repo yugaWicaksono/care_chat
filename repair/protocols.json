@@ -67,5 +67,16 @@
         "Is er schuim zichtbaar of is de scheur breder dan een hand, vraag dan een vervangend matras aan."
       ]
     }
+  },
+  "models": {
+    "bariatricrest xl": {
+      "motor defect": {
+        "severity": "major",
+        "steps": [
+          "Haal de stekker van het bed uit het stopcontact.",
+          "Open de motorbehuizing niet; dit bariatrische bed heeft een zwaardere motor en moet worden nagekeken door een technicus die ervaring heeft met bariatrische apparatuur."
+        ]
+      }
+    }
   }
 }

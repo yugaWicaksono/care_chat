@@ -47,13 +47,19 @@ TICKET_FIELDS = (
     "client_number",
 )
 
-def lookup_severity(product: str, issue: str) -> str:
+def lookup_severity(product: str, issue: str, product_model: str = "") -> str:
     """
     Lookup severity based on product and issue
     :param product: the product from the catalog
     :param issue: issue with the product
+    :param product_model: specific catalog model, if known — checked first for a
+        model-specific override before falling back to the generic product entry
     """
     # catalog is the source of truth for severity, never the model
+    if product_model:
+        model_entry = PROTOCOLS.get("models", {}).get(product_model.lower(), {}).get(issue.lower())
+        if model_entry:
+            return model_entry["severity"]
     return PROTOCOLS.get(product.lower(), {}).get(issue.lower(), {}).get("severity", "unknown")
 
 
@@ -82,6 +88,6 @@ def create_replacement_request(args: dict) -> dict:
     ticket = {field: str(args.get(field, "")) for field in TICKET_FIELDS}
     ticket["ticket_id"] = generate_ticket_id()
     ticket["created_at"] = datetime.now(timezone.utc)
-    ticket["severity"] = lookup_severity(ticket["product"], ticket["issue"])
+    ticket["severity"] = lookup_severity(ticket["product"], ticket["issue"], ticket["product_model"])
     insert_ticket(ticket)
     return {"ticket_id": ticket["ticket_id"], "status": "replacement arranged, pickup scheduled"}
