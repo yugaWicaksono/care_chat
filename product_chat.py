@@ -1,12 +1,11 @@
 import json
 from pathlib import Path
 
-import ollama
 from fastapi import APIRouter, Header
 from fastapi.responses import FileResponse
 
+import llm
 from chat_types import ChatIn
-from const import MODEL, OLLAMA_OPTIONS
 from product import PRODUCT_SYSTEM_PROMPT, find_suitable_wheelchairs
 from product import TOOL_SCHEMA as PRODUCT_TOOL_SCHEMA
 
@@ -29,9 +28,7 @@ def chat_product(body: ChatIn, x_session_id: str = Header(...)):
     )
     history.append({"role": "user", "content": body.message})
 
-    response = ollama.chat(
-        model=MODEL, messages=history, tools=[PRODUCT_TOOL_SCHEMA], options=OLLAMA_OPTIONS
-    )
+    response = llm.chat(messages=history, tools=[PRODUCT_TOOL_SCHEMA])
     message = response["message"]
     history.append(message)
 
@@ -46,7 +43,7 @@ def chat_product(body: ChatIn, x_session_id: str = Header(...)):
             else:
                 result = {"error": f"unknown tool: {name}"}
             history.append({"role": "tool", "content": json.dumps(result)})
-        response = ollama.chat(model=MODEL, messages=history, options=OLLAMA_OPTIONS)
+        response = llm.chat(messages=history)
         message = response["message"]
         history.append(message)
 

@@ -23,7 +23,7 @@ def capture_tickets(monkeypatch):
 def test_minor_path_writes_no_ticket(monkeypatch):
     tickets = capture_tickets(monkeypatch)
     monkeypatch.setattr(
-        repair_chat.ollama, "chat",
+        repair_chat.llm, "chat",
         fake_chat({"message": {"role": "assistant", "content": "Here are the repair steps."}}),
     )
     res = client.post("/chat", json={"message": "my wheelchair has a flat tire"},
@@ -49,7 +49,7 @@ def test_major_path_writes_ticket_with_server_severity(monkeypatch):
         }
     }
     monkeypatch.setattr(
-        repair_chat.ollama, "chat",
+        repair_chat.llm, "chat",
         fake_chat(
             {"message": {"role": "assistant", "content": "", "tool_calls": [tool_call]}},
             {"message": {"role": "assistant", "content": "Ticket logged, replacement on the way."}},
@@ -86,7 +86,7 @@ def test_fabricated_contact_details_rejected(monkeypatch):
         }
     }
     monkeypatch.setattr(
-        repair_chat.ollama, "chat",
+        repair_chat.llm, "chat",
         fake_chat(
             {"message": {"role": "assistant", "content": "", "tool_calls": [tool_call]}},
             {"message": {"role": "assistant", "content": "Could you give me your name and address?"}},
@@ -124,7 +124,7 @@ def test_lookup_customer_then_ticket_uses_stored_details(monkeypatch):
         }
     }
     monkeypatch.setattr(
-        repair_chat.ollama, "chat",
+        repair_chat.llm, "chat",
         fake_chat(
             {"message": {"role": "assistant", "content": "", "tool_calls": [lookup_call]}},
             {"message": {"role": "assistant", "content": "Ik heb je gevonden, Jan."}},
@@ -165,7 +165,7 @@ def test_client_number_without_lookup_still_requires_fabrication_guard(monkeypat
         }
     }
     monkeypatch.setattr(
-        repair_chat.ollama, "chat",
+        repair_chat.llm, "chat",
         fake_chat(
             {"message": {"role": "assistant", "content": "", "tool_calls": [tool_call]}},
             {"message": {"role": "assistant", "content": "Kun je je gegevens geven?"}},
@@ -185,7 +185,7 @@ def test_product_chat_calls_wheelchair_matcher(monkeypatch):
         }
     }
     monkeypatch.setattr(
-        product_chat.ollama, "chat",
+        product_chat.llm, "chat",
         fake_chat(
             {"message": {"role": "assistant", "content": "", "tool_calls": [tool_call]}},
             {"message": {"role": "assistant", "content": "Deze rolstoelen passen bij u."}},
