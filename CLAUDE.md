@@ -10,7 +10,8 @@ Local chatbot for care-product repair support (wheelchairs, support beds). Users
 - `product_chat.py` — `APIRouter`: `GET /product-advies` (serves `static/product.html`) + `POST /chat/product` (product dispatch loop — `find_suitable_wheelchairs` handling only). Owns its own `product_sessions` store.
 - `ticket_admin.py` — `APIRouter`: `GET /admin/tickets`, `GET /api/tickets`, `GET /api/tickets/{id}`, plus `require_admin` and the `ADMIN_USER`/`ADMIN_PASSWORD` env vars. The only auth-gated surface in the app (see below).
 - `db.py` — shared `DATABASE_URL` (env-overridable via `.env`, raises at import time if unset). Used by both `ticket/` and `customer/` — lives at project root since it's cross-domain infra, not owned by either package.
-- `repair/` — `const.py` (MODEL, OLLAMA_OPTIONS), `prompts.py` (loads `repair/protocols.json`, builds SYSTEM_PROMPT), `protocols.json` (catalog: `product -> issue -> {severity: minor|major, steps: [...]}`, lowercase keys — extend here to support new products, no code change needed), `__init__.py` re-exports `SYSTEM_PROMPT`, `MODEL`, `OLLAMA_OPTIONS`. Named `repair/`, not `prompt/` — it's specifically the repair chat's domain package (system prompt, model config, protocol catalog); `product/` has its own `prompts.py` for the product-advice chat, so a generic "prompt" name stopped reflecting which domain it belonged to.
+- `const.py` — shared `MODEL`, `OLLAMA_OPTIONS`. Lives at project root, same reasoning as `db.py`: both `repair_chat.py` and `product_chat.py` import it directly and independently, so it's app-wide config, not owned by either chat's domain package.
+- `repair/` — `prompts.py` (loads `repair/protocols.json`, builds SYSTEM_PROMPT), `protocols.json` (catalog: `product -> issue -> {severity: minor|major, steps: [...]}`, lowercase keys — extend here to support new products, no code change needed), `__init__.py` re-exports `SYSTEM_PROMPT`. Named `repair/`, not `prompt/` — it's specifically the repair chat's domain package (system prompt, protocol catalog); `product/` has its own `prompts.py` for the product-advice chat, so a generic "prompt" name stopped reflecting which domain it belonged to.
 - `ticket/` — `tickets.py` (TOOL_SCHEMA, TICKET_FIELDS, lookup_severity, fabricated_fields, insert_ticket, list_tickets, get_ticket, generate_ticket_id, create_replacement_request — both the Python function and the tool-call name the model sees are `create_replacement_request`; imports PROTOCOLS from `repair.prompts`, DATABASE_URL from `db`), `schema.sql` (`tickets` table, auto-run by the `db` docker-compose service on first start), `__init__.py` re-exports `TOOL_SCHEMA`, `fabricated_fields`, `create_replacement_request`, `list_tickets`, `get_ticket`.
 - `customer/` — `customers.py` (TOOL_SCHEMA for `lookup_customer`, `find_customer` raw query, `lookup_customer` dispatch wrapper), `schema.sql`/`seed.sql` (auto-run by the `db` docker-compose service on first start), `__init__.py` re-exports `TOOL_SCHEMA`, `lookup_customer`. **Lookup-only** — the bot never writes to this table, only the operator does (via `psql`/SQL insert).
 - `product/` — genuinely separate chat mode, not a tool bolted onto the repair prompt (see below). `catalog.json` (5 fictional wheelchairs — invented names, no real manufacturer/URL; spec *shapes* — seat width/depth ranges, max weight, type categories — are grounded in realistic wheelchair data, but no real vendor's actual lineup), `products.py` (TOOL_SCHEMA for `find_suitable_wheelchairs`, the matching function itself), `prompts.py` (PRODUCT_SYSTEM_PROMPT, imports CATALOG from `.products` rather than reloading the file), `__init__.py` re-exports `TOOL_SCHEMA`, `find_suitable_wheelchairs`, `PRODUCT_SYSTEM_PROMPT`.
@@ -20,7 +21,7 @@ Local chatbot for care-product repair support (wheelchairs, support beds). Users
 - `docker-compose.yml` — local Postgres for both `customers` and `tickets` tables; schemas + example customer rows auto-loaded on first `docker compose up`.
 - `test_chat.py` — smoke tests with mocked `ollama.chat`, mocked `customer.customers.find_customer`, mocked `ticket.tickets.insert_ticket`; no model, no Ollama, no Postgres needed to run.
 
-Model: `mistral-small` (constant `MODEL` in `repair/const.py`, ~14GB). Switched from `qwen2.5:14b-instruct` — same/better Dutch fluency, and noticeably more reliable structured tool-calling: qwen2.5:14b occasionally skipped `lookup_customer` while claiming it had looked someone up, or leaked a hand-written pseudo tool-call as visible text instead of a real tool call; 5/5 trials on mistral-small produced a clean structured call. One-line swap in `repair/const.py` to try something else later.
+Model: `mistral-small` (constant `MODEL` in `const.py`, ~14GB). Switched from `qwen2.5:14b-instruct` — same/better Dutch fluency, and noticeably more reliable structured tool-calling: qwen2.5:14b occasionally skipped `lookup_customer` while claiming it had looked someone up, or leaked a hand-written pseudo tool-call as visible text instead of a real tool call; 5/5 trials on mistral-small produced a clean structured call. One-line swap in `const.py` to try something else later.
 
 ### Diagram
 
@@ -39,9 +40,10 @@ flowchart TB
   end
 
   OLLAMA[("Ollama<br/>mistral-small")]
+  CONST["const.py<br/>MODEL, OLLAMA_OPTIONS"]
 
   subgraph DOM["domain packages — plain functions, no FastAPI"]
-    REPAIR["repair/<br/>SYSTEM_PROMPT, protocols.json<br/>MODEL, OLLAMA_OPTIONS"]
+    REPAIR["repair/<br/>SYSTEM_PROMPT, protocols.json"]
     TICKET["ticket/<br/>create_replacement_request<br/>fabricated_fields, lookup_severity"]
     CUSTOMER["customer/<br/>lookup_customer (read-only)"]
     PRODUCT["product/<br/>find_suitable_wheelchairs<br/>catalog.json"]
@@ -55,12 +57,13 @@ flowchart TB
 
   RC -- "tools: ticket + customer" --> OLLAMA
   PC -- "tools: product" --> OLLAMA
+  RC --> CONST
+  PC --> CONST
 
   RC --> REPAIR
   RC --> TICKET
   RC --> CUSTOMER
   PC --> PRODUCT
-  PC -. "MODEL, OLLAMA_OPTIONS only" .-> REPAIR
   TICKET -. "PROTOCOLS, for severity" .-> REPAIR
 
   TA --> TICKET

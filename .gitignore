@@ -6,3 +6,6 @@ __pycache__/
 
 .env
 .DS_Store
+
+# graphify - AI tool
+graphify-out
