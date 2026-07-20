@@ -58,6 +58,7 @@
   }
   .badge.major { background: #fde2e2; color: #b42318; }
   .badge.minor { background: #e2f5e9; color: #15803d; }
+  .badge.part { background: #fef3c7; color: #92400e; }
   .badge.unknown { background: #e9edf2; color: #445; }
   #detail { padding: 1.5rem; display: none; }
   #detail .summary {
@@ -109,7 +110,7 @@
   }
 
   function badge(severity) {
-    const cls = ["minor", "major"].includes(severity) ? severity : "unknown";
+    const cls = ["minor", "major", "part"].includes(severity) ? severity : "unknown";
     return `<span class="badge ${cls}">${severity}</span>`;
   }
 

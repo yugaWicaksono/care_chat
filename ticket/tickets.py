@@ -10,8 +10,9 @@ TOOL_SCHEMA = {
     "function": {
         "name": "create_replacement_request",
         "description": (
-            "Log a repair ticket: arranges a temporary replacement and pickup of the "
-            "damaged item. Only call after the user has confirmed their details."
+            "Log a repair ticket: for major issues, arranges a temporary replacement and "
+            "pickup of the damaged item; for part-only issues, arranges just the spare part "
+            "with no pickup. Only call after the user has confirmed their details."
         ),
         "parameters": {
             "type": "object",
@@ -90,4 +91,9 @@ def create_replacement_request(args: dict) -> dict:
     ticket["created_at"] = datetime.now(timezone.utc)
     ticket["severity"] = lookup_severity(ticket["product"], ticket["issue"], ticket["product_model"])
     insert_ticket(ticket)
-    return {"ticket_id": ticket["ticket_id"], "status": "replacement arranged, pickup scheduled"}
+    status = (
+        "spare part will be arranged, no pickup of the item needed"
+        if ticket["severity"] == "part"
+        else "replacement arranged, pickup scheduled"
+    )
+    return {"ticket_id": ticket["ticket_id"], "status": status}

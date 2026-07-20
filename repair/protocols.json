@@ -32,6 +32,13 @@
         "Breng een reparatiepatch voor vinyl/stof aan over de scheur en druk stevig aan.",
         "Is de scheur breder dan een hand of zakt de zitting door, vraag dan een vervangende zitting aan."
       ]
+    },
+    "wiel kapot": {
+      "severity": "part",
+      "steps": [
+        "Gebruik de rolstoel niet met het beschadigde wiel; dit kan sturing en stabiliteit beinvloeden.",
+        "Het wiel zelf wordt vervangen, de rolstoel hoeft hiervoor niet opgehaald te worden."
+      ]
     }
   },
   "zorgbed": {
@@ -66,6 +73,13 @@
         "Gebruik een waterdichte matrasbeschermer zodat er geen vocht in het schuim komt.",
         "Is er schuim zichtbaar of is de scheur breder dan een hand, vraag dan een vervangend matras aan."
       ]
+    },
+    "afstandsbediening kapot": {
+      "severity": "part",
+      "steps": [
+        "Gebruik de afstandsbediening niet meer als deze fysiek beschadigd is.",
+        "Alleen de afstandsbediening zelf wordt vervangen, het bed hoeft hiervoor niet opgehaald te worden."
+      ]
     }
   },
   "models": {
@@ -75,6 +89,83 @@
         "steps": [
           "Haal de stekker van het bed uit het stopcontact.",
           "Open de motorbehuizing niet; dit bariatrische bed heeft een zwaardere motor en moet worden nagekeken door een technicus die ervaring heeft met bariatrische apparatuur."
+        ]
+      }
+    },
+    "widesupport xl": {
+      "lekke band": {
+        "severity": "minor",
+        "steps": [
+          "Zorg dat de rolstoel stabiel staat en dat er niemand in zit.",
+          "Dit model heeft extra brede, versterkte banden; gebruik een reparatieset voor zware/brede banden, een gewone fietsreparatieset past vaak niet goed.",
+          "Bij een lekke band: verwijder het wiel met de snelspanas of een moersleutel.",
+          "Vervang de binnenband of gebruik de reparatieset op het gat.",
+          "Plaats het wiel terug en controleer of het vrij draait en de remmen goed grijpen."
+        ]
+      },
+      "scheur in frame": {
+        "severity": "major",
+        "steps": [
+          "Gebruik de rolstoel meteen niet meer; dit is een zwaarbelast frame (tot 295 kg) en een scheur kan sneller bezwijken dan bij een standaard model.",
+          "Probeer niet zelf te lassen of te verstevigen; laat nakijken door een technicus die ervaring heeft met zwaarbelaste rolstoelen."
+        ]
+      }
+    },
+    "tiltcare comfort": {
+      "remmen defect": {
+        "severity": "major",
+        "steps": [
+          "Gebruik de rolstoel meteen niet meer; falende remmen zijn een veiligheidsrisico, zeker in een gekantelde stand.",
+          "Zet de rolstoel zo mogelijk terug in de normale (niet-gekantelde) stand voordat je hem stilzet, en probeer er niet mee te rijden totdat deze is nagekeken."
+        ]
+      }
+    },
+    "adaptfit pro": {
+      "gescheurde bekleding": {
+        "severity": "minor",
+        "steps": [
+          "Controleer of de scheur de ondersteuning van de zitting aantast; kleine scheuren zijn cosmetisch.",
+          "Maak het gebied rond de scheur schoon met milde zeep en laat het drogen.",
+          "Breng een reparatiepatch voor vinyl/stof aan over de scheur en druk stevig aan.",
+          "Dit model is taxi-goedgekeurd; is de scheur breder dan een hand of zakt de zitting door, vraag dan een vervangende zitting aan voordat de rolstoel weer voor taxivervoer gebruikt wordt."
+        ]
+      },
+      "verstelmechanisme klemt": {
+        "severity": "minor",
+        "steps": [
+          "Zorg dat de rolstoel stabiel staat en dat er niemand in zit.",
+          "Dit model is multi-instelbaar; controleer of de borgpinnen van de zitbreedte- of zitdiepte-instelling volledig zijn ingeklikt.",
+          "Maak de rails en pinnen schoon van vuil of pluis en breng een klein beetje siliconenspray aan, geen olie.",
+          "Test de instelling voorzichtig; blijft het mechanisme klemmen of doorzakken, gebruik de instelling dan niet totdat deze is nagekeken."
+        ]
+      },
+      "scheur in frame": {
+        "severity": "major",
+        "steps": [
+          "Gebruik de rolstoel meteen niet meer; dit is een lichtgewicht frame en een scheur kan sneller bezwijken dan bij een standaard model.",
+          "Probeer niet zelf te lassen of te verstevigen.",
+          "Dit model is taxi-goedgekeurd; bij een scheur vervalt die goedkeuring totdat het frame is nagekeken en vrijgegeven."
+        ]
+      }
+    },
+    "lowlow safebed": {
+      "motor defect": {
+        "severity": "major",
+        "steps": [
+          "Haal de stekker van het bed uit het stopcontact.",
+          "Laat het bed niet in een verhoogde stand staan als dat te vermijden is; dit laag-laag model is bedoeld om laag te staan tegen valrisico, dus blijf extra voorzichtig tot het is nagekeken.",
+          "Open de motorbehuizing niet; dit moet door een technicus worden nagekeken."
+        ]
+      }
+    },
+    "motionadjust plus": {
+      "afstandsbediening reageert niet": {
+        "severity": "minor",
+        "steps": [
+          "Controleer of de kabel van de afstandsbediening goed vastzit in de bedieningskast onder het bed.",
+          "Vervang de batterijen van de afstandsbediening als het een draadloos model is.",
+          "Haal de stekker 60 seconden uit het stopcontact en steek deze er weer in om de bedieningskast te resetten.",
+          "Test elke knop apart: rug-, been- en hoogtestand hebben elk een eigen knop op dit model; werkt slechts één functie niet, dan is vaak alleen die knop of kabel defect en hoeft niet de hele afstandsbediening vervangen te worden."
         ]
       }
     }

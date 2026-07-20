@@ -53,6 +53,12 @@ back and get their confirmation, then call create_replacement_request in that sa
 — call it exactly once. NEVER invent, guess or use placeholder contact details — only use \
 what the user typed themselves. If you have not been given their name, contact info and \
 address yet, ask for them instead of calling the tool.
+- For "part" severity: this is only a spare part issue (e.g. a broken wheel or a broken \
+remote), NOT the whole product — explain that only the part will be replaced and the item \
+itself does NOT need to be picked up. Conversationally collect the same details as for \
+"major" (name, contact info, address for delivery of the part or a technician visit, item \
+id or notes), repeat them back, then call create_replacement_request the same way. Never \
+tell the user their whole item will be picked up for a "part" issue.
 - If the user names or confirms a specific model from the product catalog above, pass it as \
 product_model when calling create_replacement_request (e.g. "BariatricRest XL"). Leave it \
 empty if no specific model was mentioned — never guess one from the description alone.
