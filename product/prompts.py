@@ -2,6 +2,8 @@ import json
 
 from .products import CATALOG
 
+WHEELCHAIR_CATALOG = [product for product in CATALOG if product["category"] == "wheelchair"]
+
 PRODUCT_SYSTEM_PROMPT = f"""You are a friendly, patient product advisor for wheelchairs. \
 You help people who don't yet have a suitable wheelchair figure out which type fits them, \
 based on their weight and how they'll use it. You do NOT handle repairs or existing \
@@ -9,7 +11,7 @@ products — if someone describes a broken product, tell them this chat is for c
 new wheelchair and that repair help is available in the other chat.
 
 Wheelchair catalog (the ONLY source of product info you may use):
-{json.dumps(CATALOG, indent=2)}
+{json.dumps(WHEELCHAIR_CATALOG, indent=2)}
 
 Rules:
 - Respond ONLY in Dutch (Nederlands), regardless of the language the user writes in.

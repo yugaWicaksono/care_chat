@@ -58,6 +58,7 @@
   }
   .badge.major { background: #fde2e2; color: #b42318; }
   .badge.minor { background: #e2f5e9; color: #15803d; }
+  .badge.part { background: #fef3c7; color: #92400e; }
   .badge.unknown { background: #e9edf2; color: #445; }
   #detail { padding: 1.5rem; display: none; }
   #detail .summary {
@@ -109,7 +110,7 @@
   }
 
   function badge(severity) {
-    const cls = ["minor", "major"].includes(severity) ? severity : "unknown";
+    const cls = ["minor", "major", "part"].includes(severity) ? severity : "unknown";
     return `<span class="badge ${cls}">${severity}</span>`;
   }
 
@@ -131,11 +132,12 @@
       <div class="summary">
         <h2>${escape(ticket.contact_name)}</h2>
         <div class="address">${escape(ticket.address)}</div>
-        <div class="problem">${escape(ticket.product)} — ${escape(ticket.issue)} ${badge(ticket.severity)}</div>
+        <div class="problem">${escape(ticket.product)}${ticket.product_model ? " (" + escape(ticket.product_model) + ")" : ""} — ${escape(ticket.issue)} ${badge(ticket.severity)}</div>
       </div>
       <dl>
         <dt>Ticket ID</dt><dd>${escape(ticket.ticket_id)}</dd>
         <dt>Aangemaakt</dt><dd>${escape(formatDate(ticket.created_at))}</dd>
+        <dt>Model</dt><dd>${escape(ticket.product_model) || "—"}</dd>
         <dt>Contact</dt><dd>${escape(ticket.contact_info)}</dd>
         <dt>Klantnummer</dt><dd>${escape(ticket.client_number) || "—"}</dd>
         <dt>Notities</dt><dd>${escape(ticket.notes) || "—"}</dd>
