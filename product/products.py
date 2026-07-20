@@ -59,11 +59,11 @@ def find_suitable_wheelchairs(args: dict) -> dict:
     needs_tilt = args.get("needs_tilt")
     taxi_transport = args.get("taxi_transport")
 
-    candidates = list(CATALOG)
+    candidates = [product for product in CATALOG if product["category"] == "wheelchair"]
     if weight_kg is not None:
-        candidates = [p for p in candidates if weight_kg <= p["max_weight_kg"]]
+        candidates = [product for product in candidates if weight_kg <= product["max_weight_kg"]]
     if self_propelled is True:
-        candidates = [p for p in candidates if p["self_propelled"]]
+        candidates = [product for product in candidates if product["self_propelled"]]
     if not candidates:
         return {"matches": [], "none_fit": True, "estimate_only": False}
 

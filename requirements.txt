@@ -5,5 +5,5 @@ anthropic
 psycopg[binary]
 python-dotenv
 pytest
-httpx
+httpx2
 ruff

@@ -13,10 +13,11 @@ def insert_ticket(ticket: dict) -> None:
     with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO tickets (ticket_id, product, issue, contact_name, contact_info, "
-                "address, notes, client_number, severity, created_at) "
-                "VALUES (%(ticket_id)s, %(product)s, %(issue)s, %(contact_name)s, %(contact_info)s, "
-                "%(address)s, %(notes)s, %(client_number)s, %(severity)s, %(created_at)s)",
+                "INSERT INTO tickets (ticket_id, product, product_model, issue, contact_name, "
+                "contact_info, address, notes, client_number, severity, created_at) "
+                "VALUES (%(ticket_id)s, %(product)s, %(product_model)s, %(issue)s, %(contact_name)s, "
+                "%(contact_info)s, %(address)s, %(notes)s, %(client_number)s, %(severity)s, "
+                "%(created_at)s)",
                 ticket,
             )
 

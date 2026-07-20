@@ -1,6 +1,7 @@
 [
   {
     "name": "FlexFold Basic",
+    "category": "wheelchair",
     "type": "Vouwframe rolstoel",
     "seat_width_cm": [34, 54],
     "seat_depth_cm": [36, 54],
@@ -12,6 +13,7 @@
   },
   {
     "name": "TiltCare Comfort",
+    "category": "wheelchair",
     "type": "Kantelrolstoel",
     "seat_width_cm": [40, 54],
     "seat_depth_cm": [44, 60],
@@ -23,6 +25,7 @@
   },
   {
     "name": "TransportLine Duo",
+    "category": "wheelchair",
     "type": "Transportrolstoel",
     "seat_width_cm": [52, 58],
     "seat_depth_cm": [40, 46],
@@ -34,6 +37,7 @@
   },
   {
     "name": "WideSupport XL",
+    "category": "wheelchair",
     "type": "Rolstoel voor obese cliënten",
     "seat_width_cm": [55, 75],
     "seat_depth_cm": [45, 55],
@@ -45,6 +49,7 @@
   },
   {
     "name": "AdaptFit Pro",
+    "category": "wheelchair",
     "type": "Multi-instelbare rolstoel",
     "seat_width_cm": [37, 60],
     "seat_depth_cm": [42, 58],
@@ -53,5 +58,77 @@
     "tilt_in_space": false,
     "taxi_approved": true,
     "description": "Veelzijdig instelbare rolstoel met lichtgewicht frame, goedgekeurd voor vervoer in een taxi terwijl de gebruiker erin zit."
+  },
+  {
+    "name": "SprintActive Sport",
+    "category": "wheelchair",
+    "type": "Actieve rolstoel",
+    "seat_width_cm": [36, 48],
+    "seat_depth_cm": [38, 48],
+    "max_weight_kg": 120,
+    "self_propelled": true,
+    "tilt_in_space": false,
+    "taxi_approved": false,
+    "description": "Lichtgewicht actieve rolstoel met smal frame voor snelle, wendbare voortbeweging, geschikt voor actieve gebruikers die zelf rijden."
+  },
+  {
+    "name": "JuniorFit Compact",
+    "category": "wheelchair",
+    "type": "Compacte rolstoel voor kleine gebruikers",
+    "seat_width_cm": [24, 34],
+    "seat_depth_cm": [28, 38],
+    "max_weight_kg": 70,
+    "self_propelled": true,
+    "tilt_in_space": false,
+    "taxi_approved": false,
+    "description": "Compacte rolstoel met kleinere zitmaten voor kinderen of kleine volwassenen, met meegroeiende instelmogelijkheden."
+  },
+  {
+    "name": "CareRest Basic",
+    "category": "bed",
+    "type": "Handmatig verstelbaar zorgbed",
+    "bed_length_cm": [190, 200],
+    "max_weight_kg": 150,
+    "adjustable_height": true,
+    "electric": false,
+    "low_low": false,
+    "side_rails": true,
+    "description": "Eenvoudig zorgbed met handmatig verstelbare rug- en beensectie, geschikt als instapmodel voor lichte zorgbehoefte."
+  },
+  {
+    "name": "MotionAdjust Plus",
+    "category": "bed",
+    "type": "Elektrisch verstelbaar zorgbed",
+    "bed_length_cm": [190, 210],
+    "max_weight_kg": 180,
+    "adjustable_height": true,
+    "electric": true,
+    "low_low": false,
+    "side_rails": true,
+    "description": "Elektrisch zorgbed met traploos verstelbare rug-, been- en hoogtestand, bediend via een afstandsbediening — geschikt voor dagelijks intensief gebruik."
+  },
+  {
+    "name": "LowLow SafeBed",
+    "category": "bed",
+    "type": "Laag-laag zorgbed",
+    "bed_length_cm": [190, 200],
+    "max_weight_kg": 150,
+    "adjustable_height": true,
+    "electric": true,
+    "low_low": true,
+    "side_rails": true,
+    "description": "Elektrisch zorgbed dat tot vlak boven de vloer kan zakken om valletsel te beperken, geschikt voor gebruikers met een verhoogd valrisico."
+  },
+  {
+    "name": "BariatricRest XL",
+    "category": "bed",
+    "type": "Bariatrisch zorgbed",
+    "bed_length_cm": [200, 220],
+    "max_weight_kg": 300,
+    "adjustable_height": true,
+    "electric": true,
+    "low_low": false,
+    "side_rails": true,
+    "description": "Extra breed en stevig elektrisch zorgbed met hoge maximale gewichtsbelasting, voor gebruikers die een ruimer en robuuster bed nodig hebben."
   }
 ]
