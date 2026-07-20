@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 ollama
+anthropic
 psycopg[binary]
 python-dotenv
 pytest
