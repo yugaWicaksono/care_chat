@@ -1,10 +1,9 @@
 from .db_actions import get_ticket, list_tickets
-from .tickets import TOOL_SCHEMA, create_replacement_request, fabricated_fields
+from .tickets import TOOL_SCHEMA, create_replacement_request
 
 __all__ = [
     "TOOL_SCHEMA",
     "create_replacement_request",
-    "fabricated_fields",
     "get_ticket",
     "list_tickets",
 ]

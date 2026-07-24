@@ -35,6 +35,16 @@ def test_minor_path_writes_no_ticket(monkeypatch):
 
 def test_major_path_writes_ticket_with_server_severity(monkeypatch):
     tickets = capture_tickets(monkeypatch)
+    monkeypatch.setattr(
+        customer_customers, "find_customer",
+        lambda name=None, client_number=None: [{
+            "client_number": "TEST-002",
+            "name": "Alex",
+            "contact_info": "alex@example.com",
+            "address": "1 Main St",
+        }],
+    )
+    lookup_call = {"function": {"name": "lookup_customer", "arguments": {"name": "Alex"}}}
     tool_call = {
         "function": {
             "name": "create_replacement_request",
@@ -45,23 +55,34 @@ def test_major_path_writes_ticket_with_server_severity(monkeypatch):
                 "contact_info": "alex@example.com",
                 "address": "1 Main St",
                 "notes": "serial WC-42",
+                "client_number": "TEST-002",
             },
         }
     }
     monkeypatch.setattr(
         repair_chat.llm, "chat",
         fake_chat(
+            {"message": {"role": "assistant", "content": "", "tool_calls": [lookup_call]}},
+            {"message": {"role": "assistant", "content": "Found you, Alex."}},
             {"message": {"role": "assistant", "content": "", "tool_calls": [tool_call]}},
             {"message": {"role": "assistant", "content": "Ticket logged, replacement on the way."}},
         ),
     )
-    res = client.post(
+    session_id = "major-session"
+    res1 = client.post(
         "/chat",
-        json={"message": "Confirmed: I'm Alex, email alex@example.com, pickup at 1 Main St"},
-        headers={"X-Session-Id": "major-session"},
+        json={"message": "I'm Alex, the frame is cracked"},
+        headers={"X-Session-Id": session_id},
     )
-    assert res.status_code == 200
-    assert res.json()["reply"] == "Ticket logged, replacement on the way."
+    assert res1.status_code == 200
+
+    res2 = client.post(
+        "/chat",
+        json={"message": "Confirmed: email alex@example.com, pickup at 1 Main St"},
+        headers={"X-Session-Id": session_id},
+    )
+    assert res2.status_code == 200
+    assert res2.json()["reply"] == "Ticket logged, replacement on the way."
 
     assert len(tickets) == 1
     ticket = tickets[0]
@@ -71,7 +92,7 @@ def test_major_path_writes_ticket_with_server_severity(monkeypatch):
     assert ticket["ticket_id"]
 
 
-def test_fabricated_contact_details_rejected(monkeypatch):
+def test_unregistered_customer_ticket_rejected(monkeypatch):
     tickets = capture_tickets(monkeypatch)
     tool_call = {
         "function": {
@@ -93,9 +114,9 @@ def test_fabricated_contact_details_rejected(monkeypatch):
         ),
     )
     res = client.post("/chat", json={"message": "the frame is cracked"},
-                      headers={"X-Session-Id": "fabricated-session"})
+                      headers={"X-Session-Id": "unregistered-session"})
     assert res.status_code == 200
-    assert not tickets  # no ticket with invented details
+    assert not tickets  # no verified customer record, ticket rejected regardless of details given
 
 
 def test_lookup_customer_then_ticket_uses_stored_details(monkeypatch):
@@ -149,7 +170,7 @@ def test_lookup_customer_then_ticket_uses_stored_details(monkeypatch):
     assert ticket["client_number"] == "TEST-001"
 
 
-def test_client_number_without_lookup_still_requires_fabrication_guard(monkeypatch):
+def test_client_number_without_lookup_still_rejected(monkeypatch):
     tickets = capture_tickets(monkeypatch)
     tool_call = {
         "function": {
