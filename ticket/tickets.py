@@ -64,22 +64,6 @@ def lookup_severity(product: str, issue: str, product_model: str = "") -> str:
     return PROTOCOLS.get(product.lower(), {}).get(issue.lower(), {}).get("severity", "unknown")
 
 
-def fabricated_fields(args: dict, history: list) -> list[str]:
-    """
-    Method to prevent ticket being created when the user data is not complete
-    :param args: the chat data containing response from the user
-    :param history: the history of the user chat
-    :return:
-    """
-    # while a miss would file a ticket with invented contact details
-    user_text = " ".join(
-        m["content"] for m in history if m.get("role") == "user" and m.get("content")
-    ).casefold()
-    return [
-        field for field in ("contact_name", "contact_info", "address")
-        if not str(args.get(field, "")).strip() or str(args[field]).casefold() not in user_text
-    ]
-
 def create_replacement_request(args: dict) -> dict:
     """
     Method to create a repair request and save it in the database

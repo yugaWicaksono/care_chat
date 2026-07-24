@@ -12,10 +12,7 @@ from repair import SYSTEM_PROMPT
 from ticket import (
     TOOL_SCHEMA as TICKET_TOOL_SCHEMA,
 )
-from ticket import (
-    create_replacement_request,
-    fabricated_fields,
-)
+from ticket import create_replacement_request
 
 BASE = Path(__file__).parent
 
@@ -62,14 +59,10 @@ def chat(body: ChatIn, x_session_id: str = Header(...)):
                     }
                     result = create_replacement_request(args)
                 else:
-                    bad = fabricated_fields(args, history)
-                    if bad:
-                        result = {
-                            "error": f"Rejected: {', '.join(bad)} not provided by the user in this "
-                            "conversation. Ask the user for their real details — never guess."
-                        }
-                    else:
-                        result = create_replacement_request(args)
+                    result = {
+                        "error": "Rejected: no verified customer record. Call lookup_customer "
+                        "first — tickets can only be filed for a known customer."
+                    }
             elif name == "lookup_customer":
                 result = lookup_customer(args)
                 if result.get("match") == "single":
